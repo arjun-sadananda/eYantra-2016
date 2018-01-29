@@ -1,0 +1,104 @@
+/*
+* Team Id: 4787
+* Author List: Arjun Sadananda, Arvind Swaminath Kumar, Vinod Jacob Matthew, Vishnu Murali
+* Filename: encoders.h
+* Theme: Launch a Module
+* Functions: left_encoder_pin_config, right_encoder_pin_config, left_position_encoder_interrupt_init, right_position_encoder_interrupt_init,
+	ISR(INT5_vect), ISR(INT4_vect)
+* Global Variables: LeftWheelCount, RightWheelCount
+*/
+
+
+#ifndef ENCODERS_H_
+#define ENCODERS_H_
+
+volatile unsigned long int LeftWheelCount = 0; //to keep track of left position encoder
+volatile unsigned long int RightWheelCount = 0; //to keep track of right position encoder
+
+/*
+* Function Name: left_encoder_pin_config
+* Input: NONE
+* Output: NONE
+* Logic: Configure PORTB 5 pin for servo motor 1 operation
+* Example Call: servo1_pin_config();
+*/
+
+//Function to configure INT4 (PORTE 4) pin as input for the left position encoder
+void left_encoder_pin_config (void){
+	DDRE  = DDRE & 0xEF;  //Set the direction of the PORTE 4 pin as input
+	PORTE = PORTE | 0x10; //Enable internal pull-up for PORTE 4 pin
+}
+
+/*
+* Function Name: right_encoder_pin_config
+* Input: NONE
+* Output: NONE
+* Logic: Configure PORTB 5 pin for servo motor 1 operation
+* Example Call: right_encoder_pin_config();
+*/
+
+//Function to configure INT5 (PORTE 5) pin as input for the right position encoder
+void right_encoder_pin_config (void){
+	DDRE  = DDRE & 0xDF;  //Set the direction of the PORTE 4 pin as input
+	PORTE = PORTE | 0x20; //Enable internal pull-up for PORTE 4 pin
+}
+
+/*
+* Function Name: left_position_encoder_interrupt_init
+* Input: NONE
+* Output: NONE
+* Logic: Configure PORTB 5 pin for servo motor 1 operation
+* Example Call: left_position_encoder_interrupt_init();
+*/
+
+//Interrupt 4 enable
+void left_position_encoder_interrupt_init (void) {
+	cli(); //Clears the global interrupt
+	EICRB = EICRB | 0x02; // INT4 is set to trigger with falling edge
+	EIMSK = EIMSK | 0x10; // Enable Interrupt INT4 for left position encoder
+	sei();   // Enables the global interrupt
+}
+
+/*
+* Function Name: right_position_encoder_interrupt_init
+* Input: NONE
+* Output: NONE
+* Logic: Configure PORTB 5 pin for servo motor 1 operation
+* Example Call: right_position_encoder_interrupt_init();
+*/
+
+//Interrupt 5 enable
+void right_position_encoder_interrupt_init (void) {
+	cli(); //Clears the global interrupt
+	EICRB = EICRB | 0x08; // INT5 is set to trigger with falling edge
+	EIMSK = EIMSK | 0x20; // Enable Interrupt INT5 for right position encoder
+	sei();   // Enables the global interrupt
+}
+
+/*
+* Function Name: ISR
+* Input: NONE
+* Output: NONE
+* Logic: Configure PORTB 5 pin for servo motor 1 operation
+* Example Call: servo1_pin_config();
+*/
+
+//ISR for right position encoder
+ISR(INT5_vect){
+	//Direction = PORTA & 0x0F;
+	RightWheelCount++;  //increment right shaft position count
+}
+
+/*
+* Function Name: ISR
+* Input: NONE
+* Output: NONE
+* Logic: Configure PORTB 5 pin for servo motor 1 operation
+* Example Call: servo1_pin_config();
+*/
+
+//ISR for left position encoder
+ISR(INT4_vect){
+	LeftWheelCount++;  //increment left shaft position count
+}
+#endif /* ENCODERS_H_ */
